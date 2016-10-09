@@ -1,0 +1,7 @@
+{
+  "name": "express-parameters",
+  "main": "firebase-bridge-server.js",
+  "dependencies": {
+    "express": "~4.10.2"
+  }
+}
