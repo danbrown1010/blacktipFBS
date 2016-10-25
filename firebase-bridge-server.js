@@ -1,5 +1,3 @@
-//var connect = require('connect');
-
 //Pattern:
 //http://example.com/api/users?id=4&token=sdfa3&geo=us
 //http://localhost:8080/blacktip/measurements?id=wSVuDv51X4Xxn4K2hncytcfG3n43&tank=-KTeoKM5GO2yVjAy-7lg&name=CurrTemp&val=99.9
@@ -18,50 +16,25 @@ firebase.initializeApp({
   databaseURL: "https://sixth-tempo-89216.firebaseio.com"
 });
 
-//user = wSVuDv51X4Xxn4K2hncytcfG3n43
-//tankId = -KTel1Y20m-3yhdCjsZ2
-
-var rootRef = firebase.database().ref();
-var tanksRef = rootRef.child("tanks");
-
-
-console.log('Resetting current temp in database!')
-
-rootRef.update({
-  measurements: {
-  	wSVuDv51X4Xxn4K2hncytcfG3n43: {
-  		'-KTeoKM5GO2yVjAy-7lg': {
-  			currentTemp: "--"
-  		}
-  	}
-  }
-});
-
-
 app.listen(port);
 console.log('Server started! At http://localhost:' + port);
-// routes will go here
 app.get('/blacktip/measurements', function(req, res) {
   var user_id = req.param('id');
   var tank_id = req.param('tank');
   var  name = req.param('name');
   var value = req.param('val');
 
-  console.log(user_id + ' ' + tank_id + ' ' + name + '=' + value);
-
-  var subString = '{"measurements": {"'+user_id+'": {"'+tank_id+'": {"'+name+'": '+value+'}}}}';
-
+  var subString = '/users/'+user_id+'/tanks/'+tank_id+'/'+name+'='+value;
   console.log(subString);
-  rootRef.update({
-  measurements: {
-  	wSVuDv51X4Xxn4K2hncytcfG3n43: {
-  		'-KTeoKM5GO2yVjAy-7lg': {
-  			currentTemp: value
-  		}
-  	}
-  }
-  });
+
+  var usersRef = firebase.database().ref().child("users");
+  var thisUserRef = usersRef.child(user_id);
+  var tanksRef = thisUserRef.child("tanks");
+  var thisTank = tanksRef.child(tank_id);
+  var updateObj = {};
+  updateObj[name] = value;
+
+  thisTank.update(updateObj);
+
   res.send(subString);
-
 });
-
